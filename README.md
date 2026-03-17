@@ -1,9 +1,9 @@
 # MatrixClock
 
-[![Build](https://img.shields.io/badge/build-on%20tag-blue)](https://github.com/sha2kyou/MatrixClock/actions/workflows/build-apk-on-tag.yml)
-[![Release](https://img.shields.io/badge/release-v1.0.0-blueviolet)](https://github.com/sha2kyou/MatrixClock/releases)
-[![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/sha2kyou/MatrixClock/blob/main/LICENSE)
-[![Last Commit](https://img.shields.io/badge/last%20commit-main-informational)](https://github.com/sha2kyou/MatrixClock/commits/main)
+[![Build APK on Tag](https://github.com/sha2kyou/MatrixClock/actions/workflows/build-apk-on-tag.yml/badge.svg)](https://github.com/sha2kyou/MatrixClock/actions/workflows/build-apk-on-tag.yml)
+[![Release](https://img.shields.io/github/v/release/sha2kyou/MatrixClock?label=release)](https://github.com/sha2kyou/MatrixClock/releases)
+[![License](https://img.shields.io/github/license/sha2kyou/MatrixClock?label=license)](https://github.com/sha2kyou/MatrixClock/blob/main/LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/sha2kyou/MatrixClock?label=last%20commit)](https://github.com/sha2kyou/MatrixClock/commits/main)
 
 MatrixClock is an Android app for matrix-style clock and status display.
 
