@@ -1,5 +1,11 @@
 # MatrixClock
 
+[![Build APK on Tag](https://github.com/sha2kyou/MatrixClock/actions/workflows/build-apk-on-tag.yml/badge.svg)](https://github.com/sha2kyou/MatrixClock/actions/workflows/build-apk-on-tag.yml)
+[![Release](https://img.shields.io/github/v/release/sha2kyou/MatrixClock?label=release)](https://github.com/sha2kyou/MatrixClock/releases)
+[![Downloads](https://img.shields.io/github/downloads/sha2kyou/MatrixClock/total?label=downloads)](https://github.com/sha2kyou/MatrixClock/releases)
+[![License: MIT](https://img.shields.io/github/license/sha2kyou/MatrixClock?label=license)](https://github.com/sha2kyou/MatrixClock/blob/main/LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/sha2kyou/MatrixClock?label=last%20commit)](https://github.com/sha2kyou/MatrixClock/commits/main)
+
 MatrixClock is an Android app for matrix-style clock and status display.
 
 ## Main Features
