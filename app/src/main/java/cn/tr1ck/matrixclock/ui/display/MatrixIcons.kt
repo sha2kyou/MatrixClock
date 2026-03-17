@@ -24,12 +24,12 @@ object MatrixIcons {
         isOn(rows = rows, row = row, col = col, width = LARGE_FONT_ROWS)
 
     // ---------- Mini icons (5x5) ----------
-    internal val ICON_MINI_STAR_ROWS = intArrayOf(0x04, 0x0E, 0x1F, 0x0E, 0x04)
-    internal val ICON_MINI_MOON_ROWS = intArrayOf(0x06, 0x0F, 0x0F, 0x0F, 0x06)
-    internal val ICON_MINI_PHONE_ROWS = intArrayOf(0x04, 0x0E, 0x1F, 0x1F, 0x0E)
-    internal val ICON_MINI_ALARM_ROWS = intArrayOf(0x11, 0x0E, 0x0E, 0x0E, 0x04)
-    internal val ICON_MINI_CLOCK_ROWS = intArrayOf(0x04, 0x0E, 0x1F, 0x0E, 0x04)
-    internal val ICON_MINI_STOPWATCH_ROWS = intArrayOf(0x04, 0x0E, 0x1F, 0x1F, 0x0E)
+    internal val ICON_MINI_STAR_ROWS = intArrayOf(0x04, 0x15, 0x0E, 0x15, 0x04)
+    internal val ICON_MINI_MOON_ROWS = intArrayOf(0x0E, 0x1C, 0x18, 0x1C, 0x0E) // crescent "C"
+    internal val ICON_MINI_PHONE_ROWS = intArrayOf(0x1E, 0x1E, 0x10, 0x1E, 0x1E)
+    internal val ICON_MINI_ALARM_ROWS = intArrayOf(0x0A, 0x1F, 0x11, 0x0E, 0x04) // bell
+    internal val ICON_MINI_CLOCK_ROWS = intArrayOf(0x0E, 0x11, 0x15, 0x11, 0x0E) // circle + hands
+    internal val ICON_MINI_STOPWATCH_ROWS = intArrayOf(0x04, 0x0E, 0x11, 0x13, 0x0E) // knob + face
 
     // ---------- Medium icons (7x7) ----------
     internal val ICON_MEDIUM_STAR_ROWS = intArrayOf(0x08, 0x1C, 0x3E, 0x7F, 0x3E, 0x1C, 0x08)

@@ -58,7 +58,8 @@ fun MatrixClockApp(
     isBound: Boolean,
     ipAddress: String?,
     cycleCompleted: Int = 0,
-    cycleTotal: Int = 0
+    cycleTotal: Int = 0,
+    statusIconKey: String? = null
 ) {
     var scrollOffset by remember { mutableFloatStateOf(0f) }
     var matrixWidthForScroll by remember { mutableIntStateOf(64) }
@@ -145,6 +146,18 @@ fun MatrixClockApp(
                 val alarmIconColStart = 1
                 val alarmIconRowStart = TEXT_COUNTDOWN_ROW_START
                 val countdownStartCol = if (hasCountdown) (alarmIconColStart + MINI_GLYPH_ROWS + 1).toFloat() else CLOCK_DATE_MARGIN.toFloat()
+
+                val statusIconRows: IntArray? = if (showProgress && !hasCountdown) {
+                    when ((statusIconKey ?: "").trim().lowercase()) {
+                        "star" -> MatrixIcons.ICON_MINI_STAR_ROWS
+                        "moon" -> MatrixIcons.ICON_MINI_MOON_ROWS
+                        "phone" -> MatrixIcons.ICON_MINI_PHONE_ROWS
+                        "alarm" -> MatrixIcons.ICON_MINI_ALARM_ROWS
+                        "clock" -> MatrixIcons.ICON_MINI_CLOCK_ROWS
+                        "stopwatch" -> MatrixIcons.ICON_MINI_STOPWATCH_ROWS
+                        else -> null
+                    }
+                } else null
 
                 val showCycle = isBound && showProgress && cycleTotal > 0
                 val cycleShowStar = showCycle && cycleCompleted >= cycleTotal
@@ -240,6 +253,12 @@ fun MatrixClockApp(
                             val localRow = r - alarmIconRowStart
                             val localCol = c - alarmIconColStart
                             if (MatrixIcons.isMiniOn(MatrixIcons.ICON_MINI_ALARM_ROWS, localRow, localCol)) isOn = true
+                        }
+
+                        if (!hasCountdown && statusIconRows != null && !isOn && r in alarmIconRowStart until alarmIconRowStart + MINI_GLYPH_ROWS && c in alarmIconColStart until alarmIconColStart + MINI_GLYPH_ROWS) {
+                            val localRow = r - alarmIconRowStart
+                            val localCol = c - alarmIconColStart
+                            if (MatrixIcons.isMiniOn(statusIconRows, localRow, localCol)) isOn = true
                         }
 
                         val inStyle3Left = matrixStartColStyle3 < 0 || c < matrixStartColStyle3
