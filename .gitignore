@@ -1,0 +1,94 @@
+# Built artifacts
+bin/
+obj/
+out/
+**/build/
+
+# Android build outputs
+*.apk
+*.ap_
+*.aab
+*.aar
+*.dex
+*.class
+
+# Android Studio / IntelliJ IDEA
+.idea
+*.iml
+*.iws
+*.ipr
+.idea/caches
+.idea/libraries
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/vcs.xml
+.idea/rendererase.xml
+.idea/shelf
+.idea/codeStyles
+.idea/inspectionProfiles
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+.idea/**/aws.xml
+
+# Gradle
+.gradle
+gradle-app.setting
+!gradle-wrapper.jar
+.kotlin
+
+# Gradle wrapper scripts (should be committed)
+!gradlew
+!gradlew.bat
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Log files
+*.log
+*.hprof
+*.jfr
+*.prof
+*.orig
+*.rej
+*.swp
+*.swo
+
+# Keystores
+*.jks
+*.keystore
+!debug.keystore
+
+# Google Services
+google-services.json
+
+# Capture and recording
+/captures
+
+# External Native Build
+.externalNativeBuild
+.cxx
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Misc
+.navigation
+capture.png
+.android/
+
+# Local tooling / safety backups
+.claude/
+.git.backup-*/
