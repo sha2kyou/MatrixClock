@@ -30,7 +30,7 @@ private data class OpLogPageResponse(
 class MatrixServer(
     private val context: Context,
     port: Int,
-    private val onUpdateText: (String, String?, Int?, Int?) -> Unit,
+    private val onUpdateText: (text: String, color: String?, duration: Int?, style: Int?, icon: String?) -> Unit,
     private val onSetMode: (DisplayMode) -> Unit,
     private val onSetClockTemplate: (Int) -> Unit,
     private val onBindRequest: (String) -> String?,
@@ -227,10 +227,11 @@ class MatrixServer(
             // duration <= 0 means persistent display (no countdown).
             val duration = params["duration"]?.get(0)?.toIntOrNull()
             val style = params["style"]?.get(0)?.toIntOrNull()?.coerceIn(1, 3)
-            onUpdateText(text, color, duration, style)
+            val icon = params["icon"]?.get(0)
+            onUpdateText(text, color, duration, style, icon)
             onLogOperation(
                 "display_text",
-                "text=${logDetailMax(text, 40)},len=${text.length},color=${color ?: "-"},duration=${duration ?: -1},style=${style ?: 1},by=${maskToken(clientToken)}",
+                "text=${logDetailMax(text, 40)},len=${text.length},color=${color ?: "-"},duration=${duration ?: -1},style=${style ?: 1},icon=${icon ?: "-"},by=${maskToken(clientToken)}",
                 reqIp
             )
             return newFixedLengthResponse("OK")

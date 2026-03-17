@@ -59,6 +59,7 @@ class MainActivity : ComponentActivity() {
     private val amPmText = mutableStateOf("")
     private val remainingSeconds = mutableIntStateOf(0)
     private val totalDurationSeconds = mutableIntStateOf(60)
+    private val statusIconKey = mutableStateOf<String?>(null)
     
     private val showColon = mutableStateOf(true)
     
@@ -352,7 +353,7 @@ class MainActivity : ComponentActivity() {
     private fun initServer(isWebEnabled: Boolean) {
         if (server == null) {
             server = MatrixServer(this, 6574,
-                onUpdateText = { text, colorHex, duration, style ->
+                onUpdateText = { text, colorHex, duration, style, icon ->
                     runOnUiThread {
                         if (displayMode.value == DisplayMode.TEXT && sessionConfigId != null) endPomodoroSessionIfAny(completed = false)
                         sessionConfigId = null
@@ -366,9 +367,11 @@ class MainActivity : ComponentActivity() {
                             // Persistent display (no countdown).
                             totalDurationSeconds.intValue = 0
                             remainingSeconds.intValue = -1
+                            statusIconKey.value = icon
                         } else {
                             totalDurationSeconds.intValue = seconds
                             remainingSeconds.intValue = seconds
+                            statusIconKey.value = null
                         }
                         colorHex?.let {
                             try {
@@ -574,7 +577,8 @@ class MainActivity : ComponentActivity() {
                         isBound = authRecords.isNotEmpty(),
                         ipAddress = currentIp,
                         cycleCompleted = todayCompleted,
-                        cycleTotal = activeCycleTotal
+                        cycleTotal = activeCycleTotal,
+                        statusIconKey = statusIconKey.value
                     )
                     
                     bindRequestIp?.let { ip ->

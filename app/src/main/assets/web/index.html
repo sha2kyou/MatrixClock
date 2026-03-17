@@ -184,6 +184,18 @@
                                 <input type="text" id="statusTxt" placeholder="Enter status..." maxlength="20">
                             </div>
                             <div class="form-group">
+                                <label>Icon (top-left)</label>
+                                <select id="statusIcon">
+                                    <option value="">None</option>
+                                    <option value="star">Star</option>
+                                    <option value="moon">Moon</option>
+                                    <option value="phone">Phone</option>
+                                    <option value="alarm">Alarm</option>
+                                    <option value="clock">Clock</option>
+                                    <option value="stopwatch">Stopwatch</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label>Style</label>
                                 <select id="statusStyle">
                                     <option value="1">Style 1 (two-line progress)</option>
@@ -795,9 +807,10 @@
                         async function doStatus() {
                             const val = document.getElementById('statusTxt').value;
                             const style = document.getElementById('statusStyle').value;
+                            const icon = document.getElementById('statusIcon').value || '';
                             const tk = localStorage.getItem('matrix_tk');
                             const colorToSend = getStatusColor();
-                            const r = await fetch('/api/display?token=' + encodeURIComponent(tk) + '&text=' + encodeURIComponent(val) + '&color=' + encodeURIComponent(colorToSend) + '&duration=0&style=' + encodeURIComponent(style), { method: 'POST' });
+                            const r = await fetch('/api/display?token=' + encodeURIComponent(tk) + '&text=' + encodeURIComponent(val) + '&color=' + encodeURIComponent(colorToSend) + '&duration=0&style=' + encodeURIComponent(style) + '&icon=' + encodeURIComponent(icon), { method: 'POST' });
                             if(r.status === 403) { alert('Expired'); doReset(); }
                             else if(r.ok) showToast("Status Updated!");
                         }
