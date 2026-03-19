@@ -58,6 +58,34 @@ class MatrixServer(
         }.getOrElse { "<html><body><h3>Failed to load web UI</h3></body></html>" }
     }
 
+    /**
+     * 从 assets/web/ 提供 Vite 打包的 JS/CSS（请求路径形如 /assets/index-xxxxx.js）。
+     */
+    private fun serveWebStatic(uri: String): Response? {
+        val trimmed = uri.trimStart('/')
+        if (!trimmed.startsWith("assets/")) return null
+        val assetPath = "web/$trimmed"
+        return try {
+            val stream = context.assets.open(assetPath)
+            val mime = when {
+                trimmed.endsWith(".js", ignoreCase = true) -> "application/javascript"
+                trimmed.endsWith(".mjs", ignoreCase = true) -> "application/javascript"
+                trimmed.endsWith(".css", ignoreCase = true) -> "text/css"
+                trimmed.endsWith(".svg", ignoreCase = true) -> "image/svg+xml"
+                trimmed.endsWith(".woff2", ignoreCase = true) -> "font/woff2"
+                trimmed.endsWith(".woff", ignoreCase = true) -> "font/woff"
+                trimmed.endsWith(".ttf", ignoreCase = true) -> "font/ttf"
+                trimmed.endsWith(".ico", ignoreCase = true) -> "image/x-icon"
+                trimmed.endsWith(".png", ignoreCase = true) -> "image/png"
+                trimmed.endsWith(".json", ignoreCase = true) -> "application/json"
+                else -> "application/octet-stream"
+            }
+            newChunkedResponse(Response.Status.OK, mime, stream)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     private fun diffKeySettings(old: List<String>, new: List<String>): List<String> {
         val labels = listOf("volUpShort", "volUpLong", "volUpDouble", "volDownShort", "volDownLong", "volDownDouble")
         return labels.mapIndexedNotNull { idx, label ->
@@ -124,6 +152,11 @@ class MatrixServer(
             val t = token.trim()
             return if (t.length <= 8) "****" else "${t.take(4)}...${t.takeLast(4)}"
         }
+        fun resolveDevice(token: String?): String {
+            if (token.isNullOrBlank()) return "-"
+            val name = getAuthRecords().firstOrNull { it.token == token }?.deviceName
+            return if (!name.isNullOrBlank()) name else maskToken(token)
+        }
         fun logDetailMax(text: String?, max: Int = 80): String {
             val v = (text ?: "").replace("\n", " ").trim()
             return if (v.length > max) "${v.take(max)}…" else v
@@ -184,8 +217,9 @@ class MatrixServer(
             val clientToken = params["token"]?.get(0)
             val revokeToken = params["revokeToken"]?.get(0)
             if (!hasValidToken(clientToken) || revokeToken.isNullOrBlank()) return newFixedLengthResponse(Response.Status.FORBIDDEN, MIME_PLAINTEXT, "Forbidden")
+            val revokeDeviceName = resolveDevice(revokeToken)
             removeAuthByToken(revokeToken)
-            onLogOperation("auth_revoke", "by=${maskToken(clientToken)},target=${maskToken(revokeToken)}", reqIp)
+            onLogOperation("auth_revoke", "by=${resolveDevice(clientToken)},target=$revokeDeviceName", reqIp)
             return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, "OK")
         }
 
@@ -196,7 +230,7 @@ class MatrixServer(
             val parsedMode = runCatching { DisplayMode.valueOf(mode) }.getOrNull()
                 ?: return newFixedLengthResponse(Response.Status.BAD_REQUEST, MIME_PLAINTEXT, "Invalid mode")
             onSetMode(parsedMode)
-            onLogOperation("mode", "mode=$mode,by=${maskToken(clientToken)}", reqIp)
+            onLogOperation("mode", "mode=$mode,by=${resolveDevice(clientToken)}", reqIp)
             return newFixedLengthResponse("OK")
         }
 
@@ -231,7 +265,7 @@ class MatrixServer(
             onUpdateText(text, color, duration, style, icon)
             onLogOperation(
                 "display_text",
-                "text=${logDetailMax(text, 40)},len=${text.length},color=${color ?: "-"},duration=${duration ?: -1},style=${style ?: 1},icon=${icon ?: "-"},by=${maskToken(clientToken)}",
+                "text=${logDetailMax(text, 40)},len=${text.length},color=${color ?: "-"},duration=${duration ?: -1},style=${style ?: 1},icon=${icon ?: "-"},by=${resolveDevice(clientToken)}",
                 reqIp
             )
             return newFixedLengthResponse("OK")
@@ -328,6 +362,11 @@ class MatrixServer(
                 "application/json",
                 Json.encodeToString(OpLogPageResponse(items = items, hasMore = hasMore))
             )
+        }
+
+        // Vite 构建的前端静态资源：/assets/*
+        if (method == Method.GET) {
+            serveWebStatic(uri)?.let { return it }
         }
 
         return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Not Found")
