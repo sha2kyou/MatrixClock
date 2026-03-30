@@ -29,13 +29,24 @@ jobs:
       - name: Decode Android keystore
         run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 --decode > app/release.keystore
 
+      - name: Resolve app version from tag
+        run: |
+          RAW_TAG="${GITHUB_REF_NAME#v}"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$RAW_TAG"
+          : "${MAJOR:=0}"
+          : "${MINOR:=0}"
+          : "${PATCH:=0}"
+          APP_VERSION_CODE=$((MAJOR * 10000 + MINOR * 100 + PATCH))
+          echo "APP_VERSION_NAME=${RAW_TAG}" >> "$GITHUB_ENV"
+          echo "APP_VERSION_CODE=${APP_VERSION_CODE}" >> "$GITHUB_ENV"
+
       - name: Build release APK
         env:
           SIGNING_STORE_FILE: release.keystore
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        run: ./gradlew :app:assembleRelease
+        run: ./gradlew :app:assembleRelease -PAPP_VERSION_NAME="${APP_VERSION_NAME}" -PAPP_VERSION_CODE="${APP_VERSION_CODE}"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4

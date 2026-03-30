@@ -4,6 +4,9 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+val appVersionCode = (project.findProperty("APP_VERSION_CODE") as String?)?.toIntOrNull() ?: 10000
+val appVersionName = (project.findProperty("APP_VERSION_NAME") as String?) ?: "1.0.0"
+
 android {
     namespace = "cn.tr1ck.matrixclock"
     compileSdk = 36
@@ -12,8 +15,8 @@ android {
         applicationId = "cn.tr1ck.matrixclock"
         minSdk = 26
         targetSdk = 36
-        versionCode = 10000
-        versionName = "1.0.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
