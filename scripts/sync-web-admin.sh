@@ -1,26 +1,36 @@
 #!/usr/bin/env bash
-# 将 Vite 构建后的管理台同步到 app/src/main/assets/web/
-# 用法：
-#   export MATRIX_WEB_SRC=/path/to/remix_-hardware-management-system
+# Build the Vite admin app and sync output into app/src/main/assets/web/
+#
+# Usage:
 #   ./scripts/sync-web-admin.sh
+# Optional: MATRIX_WEB_SRC=/other/path ./scripts/sync-web-admin.sh
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SRC="${MATRIX_WEB_SRC:-$HOME/Downloads/remix_-hardware-management-system}"
+SRC="${MATRIX_WEB_SRC:-$ROOT/admin}"
 DEST="$ROOT/app/src/main/assets/web"
 
 if [[ ! -f "$SRC/package.json" ]]; then
-  echo "未找到前端项目: $SRC"
-  echo "请设置 MATRIX_WEB_SRC 为 remix 项目根目录"
+  echo "Admin UI not found: $SRC"
+  echo "Set MATRIX_WEB_SRC to the admin project root, or add admin/ under the repo."
   exit 1
 fi
 
 echo ">>> npm install & build: $SRC"
-(cd "$SRC" && npm install && npm run build)
+if [[ -f "$SRC/package-lock.json" ]]; then
+  (cd "$SRC" && npm ci && npm run build)
+else
+  (cd "$SRC" && npm install && npm run build)
+fi
 
-echo ">>> 同步到 $DEST"
+if [[ ! -f "$SRC/dist/index.html" ]] || [[ ! -d "$SRC/dist/assets" ]]; then
+  echo "Build output missing: expected $SRC/dist/index.html and $SRC/dist/assets/"
+  exit 1
+fi
+
+echo ">>> sync -> $DEST"
 mkdir -p "$DEST"
 rm -rf "$DEST/assets"
 cp -f "$SRC/dist/index.html" "$DEST/index.html"
 cp -R "$SRC/dist/assets" "$DEST/assets"
 
-echo "完成。请重新编译 APK。"
+echo "Done. Rebuild the APK to pick up assets."

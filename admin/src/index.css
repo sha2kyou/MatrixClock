@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  
+  --color-hw-bg: var(--hw-bg);
+  --color-hw-card: var(--hw-card);
+  --color-hw-text: var(--hw-text);
+  --color-hw-muted: var(--hw-muted);
+  --color-hw-accent: #0A84FF;
+  --color-hw-border: var(--hw-border);
+  --color-hw-surface: var(--hw-surface);
+  --color-hw-surface-hover: var(--hw-surface-hover);
+}
+
+:root {
+  /* Default Dark Theme */
+  --hw-bg: #000000;
+  --hw-card: rgba(28, 28, 30, 0.8);
+  --hw-text: #FFFFFF;
+  --hw-muted: #8E8E93;
+  --hw-border: rgba(255, 255, 255, 0.1);
+  --hw-surface: rgba(255, 255, 255, 0.05);
+  --hw-surface-hover: rgba(255, 255, 255, 0.1);
+}
+
+.light {
+  /* Light Theme */
+  --hw-bg: #F2F2F7;
+  --hw-card: rgba(255, 255, 255, 0.8);
+  --hw-text: #000000;
+  --hw-muted: #636366;
+  --hw-border: rgba(0, 0, 0, 0.1);
+  --hw-surface: rgba(0, 0, 0, 0.05);
+  --hw-surface-hover: rgba(0, 0, 0, 0.1);
+}
+
+@layer base {
+  body {
+    @apply bg-hw-bg text-hw-text font-sans antialiased selection:bg-hw-accent/30;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+@layer components {
+  .hw-panel {
+    @apply bg-hw-card rounded-[24px] border border-hw-border backdrop-blur-xl shadow-lg overflow-hidden;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .hw-button {
+    @apply px-5 py-2.5 rounded-full bg-hw-accent text-white hover:opacity-90 font-semibold text-sm;
+  }
+
+  .hw-button-secondary {
+    @apply px-5 py-2.5 rounded-full bg-hw-surface border border-hw-border text-hw-text hover:bg-hw-surface-hover font-semibold text-sm;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  .hw-input {
+    @apply bg-hw-surface border border-hw-border rounded-xl px-4 py-2.5 text-hw-text focus:outline-none focus:ring-2 focus:ring-hw-accent/40 focus:border-hw-accent;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  select.hw-input {
+    appearance: none;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+    cursor: pointer;
+  }
+}

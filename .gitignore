@@ -89,6 +89,21 @@ Thumbs.db
 capture.png
 .android/
 
+# admin (Node / Vite)
+admin/.git/
+admin/node_modules/
+admin/dist/
+admin/build/
+admin/coverage/
+admin/.vite/
+admin/*.tsbuildinfo
+admin/npm-debug.log*
+admin/yarn-error.log*
+admin/.pnpm-debug.log*
+admin/.env
+admin/.env.*
+!admin/.env.example
+
 # Local tooling / safety backups
 .claude/
 .git.backup-*/

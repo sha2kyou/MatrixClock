@@ -6,19 +6,76 @@
 
 MatrixClock is an Android app for matrix-style clock and status display.
 
+**Layout:** Android code in `app/`; the LAN admin panel (Vite + React) lives in **`admin/`** at the repository root. Built assets are synced into `app/src/main/assets/web/` before packaging (see **Web admin** below).
+
+## Download
+
+Get the APK from [**Releases**](https://github.com/sha2kyou/MatrixClock/releases/latest) (file name `MatrixClock-v*.apk`).
+
+## Previews
+
+Screenshots live under [`preview/`](preview/).
+
+**Clock**
+
+| | | |
+|:---:|:---:|:---:|
+| ![Clock 1](preview/clock1.png) | ![Clock 2](preview/clock2.png) | ![Clock 3](preview/clock3.png) |
+
+**Pomodoro**
+
+| | | |
+|:---:|:---:|:---:|
+| ![Pomodoro 1](preview/pomodoro1.png) | ![Pomodoro 2](preview/pomodoro2.png) | ![Pomodoro 3](preview/pomodoro3.png) |
+
+**Web admin (LAN)**
+
+![Web admin](preview/admin.png)
+
+## Requirements
+
+- **Android**: 8.0 or newer (API 26+).
+- **LAN**: Phone and browser PC must be on the **same Wi‑Fi / LAN** (guest networks often isolate clients).
+- **Firewall / router**: Unblock inbound **TCP port 6574** to the phone if your network blocks device-to-device access.
+- **App running**: The HTTP server runs in the app process; keep the app running (foreground or in recents). It stops when the app is fully closed or the process is killed.
+
+## Permissions & privacy
+
+Declared permissions: `INTERNET`, `ACCESS_WIFI_STATE`, `VIBRATE`. No location, contacts, or microphone. No bundled third-party analytics SDK. Anyone on the same LAN who can reach the phone’s admin URL can attempt the in-app bind/auth flow.
+
 ## Main Features
 
-- The app starts a background web service when launched.
-- You can open the admin panel in LAN: `http://<device-ip>:6574`.
-- You can control actions with custom key bindings (short/long/double press).
-- Supports Clock, Countdown, Status, and Pomodoro modes.
+- LAN admin UI over **HTTP on port 6574** (NanoHTTPD) while the app is running.
+- Custom key bindings (short/long/double press).
+- Clock, Countdown, Status, and Pomodoro modes.
+
+## Default hardware keys
+
+Uses **Volume +** and **Volume −** (same defaults on both keys). The app consumes these keys so the system volume may not change while the clock is open.
+
+| Gesture | Default action |
+|--------|----------------|
+| **Short press** | **Pomodoro**: start the primary preset (or leave the pomodoro/text screen and return to the clock). |
+| **Long press** (~500 ms) | **Menu**: open settings. |
+| **Double press** (~350 ms between taps) | **Switch pomodoro preset**: next preset while a pomodoro countdown is showing (needs at least two presets; otherwise does nothing). |
+
+Remap actions in the web admin **Keys** section after binding.
 
 ## Quick Start
 
-1. Install and open the app on an Android device.
-2. Keep your phone/computer in the same LAN.
-3. Open `http://<device-ip>:6574` in a browser.
-4. Bind once, then manage display/settings from web admin.
+1. Install, open the app, stay on the **same LAN** as your computer (see Requirements).
+2. In a browser, open `http://<device-ip>:6574` (shown in-app when Wi‑Fi is up).
+3. Bind once, then manage display/settings from the web admin.
+
+## FAQ
+
+- **Can’t open `http://<device-ip>:6574`?** Check same Wi‑Fi, correct IP, app is running, and that nothing blocks port 6574 (firewall / “AP isolation” on the router).
+- **APK won’t install?** Use the APK from **Download** above; allow **Install unknown apps** for your browser or file manager if prompted.
+- **Still fails?** Try another browser, confirm the phone’s IP didn’t change (DHCP), and temporarily disable VPN on the phone/PC.
+
+## Versioning
+
+Tags look like `v1.0.6`. CI maps them to `versionName` (without `v`) and `versionCode = major×10000 + minor×100 + patch`. Artifacts are published via [**Releases**](https://github.com/sha2kyou/MatrixClock/releases) (see **Download** for the APK name pattern).
 
 ## Build
 
@@ -26,16 +83,25 @@ MatrixClock is an Android app for matrix-style clock and status display.
 ./gradlew :app:assembleRelease
 ```
 
-## Web 管理台（Vite + React）
+`assembleRelease` needs a release keystore (default path `app/release.keystore`, or configure `SIGNING_*` via environment variables or `-P` Gradle properties). For a quick dev install without signing setup, use `./gradlew :app:assembleDebug`.
 
-管理页源码可放在任意目录（例如下载的 `remix_-hardware-management-system`）。修改 UI 后构建并同步到 `assets/web`：
+## Web admin (Vite + React)
+
+The web admin is a Vite + React app whose **source** lives in [`admin/`](admin/) at the repo root (not bundled raw in the APK: `scripts/sync-web-admin.sh` runs `npm install` / `npm run build` there and copies `dist/` into `app/src/main/assets/web/` for the Android app).
+
+After UI changes:
 
 ```bash
-export MATRIX_WEB_SRC=/path/to/remix_-hardware-management-system
 ./scripts/sync-web-admin.sh
 ```
 
-本地开发时在该前端项目下创建 `.env`，设置 `MATRIX_PROXY_TARGET=http://<手机IP>:6574`，再 `npm run dev`，即可把 `/api` 代理到真机。
+Override the default path with `MATRIX_WEB_SRC` if the admin project is elsewhere.
 
-应用内 `MatrixServer` 会提供 `GET /`（`index.html`）以及 `GET /assets/*`（Vite 打包的 JS/CSS）。
+For local frontend development, add a `.env` in `admin/` with `MATRIX_PROXY_TARGET=http://<device-ip>:6574`, then run `npm run dev` so `/api` proxies to the phone.
+
+`MatrixServer` serves `GET /` (`index.html`) and `GET /assets/*` for the Vite-built JS/CSS.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
 
