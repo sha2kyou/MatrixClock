@@ -48,15 +48,18 @@ jobs:
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: ./gradlew :app:assembleRelease -PAPP_VERSION_NAME="${APP_VERSION_NAME}" -PAPP_VERSION_CODE="${APP_VERSION_CODE}"
 
+      - name: Rename APK with tag
+        run: mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/MatrixClock-${{ github.ref_name }}.apk
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release-${{ github.ref_name }}
-          path: app/build/outputs/apk/release/*.apk
+          path: app/build/outputs/apk/release/MatrixClock-${{ github.ref_name }}.apk
           if-no-files-found: error
 
       - name: Publish APK to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: app/build/outputs/apk/release/*.apk
+          files: app/build/outputs/apk/release/MatrixClock-${{ github.ref_name }}.apk
           generate_release_notes: true
