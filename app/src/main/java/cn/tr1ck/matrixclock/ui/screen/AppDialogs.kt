@@ -37,7 +37,8 @@ fun SettingsDialog(
     onClearAuth: () -> Unit,
     authRecords: List<AuthRecord>,
     onRevokeAuth: (String) -> Unit,
-    onOpenAuthManagement: () -> Unit
+    onOpenAuthManagement: () -> Unit,
+    onOpenAdminInBrowser: () -> Unit
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -58,11 +59,18 @@ fun SettingsDialog(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 20.sp
                 )
+                val adminLabel = if (ipAddress != null) "$ipAddress:6574" else "NO WIFI"
                 Text(
-                    text = if (ipAddress != null) "$ipAddress:6574" else "NO WIFI",
-                    color = DialogTextDim,
+                    text = adminLabel,
+                    color = if (ipAddress != null) DialogAccent else DialogTextDim,
                     fontSize = 14.sp,
-                    modifier = Modifier.padding(top = 6.dp)
+                    fontWeight = if (ipAddress != null) FontWeight.Medium else FontWeight.Normal,
+                    modifier = Modifier
+                        .padding(top = 6.dp)
+                        .then(
+                            if (ipAddress != null) Modifier.clickable { onOpenAdminInBrowser() }
+                            else Modifier
+                        )
                 )
                 Spacer(modifier = Modifier.height(20.dp))
 

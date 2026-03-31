@@ -1,7 +1,9 @@
 package cn.tr1ck.matrixclock
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
@@ -620,7 +622,16 @@ class MainActivity : ComponentActivity() {
                             onRevokeAuth = { token ->
                                 removeAuthByToken(token)
                             },
-                            onOpenAuthManagement = { showAuthManagementDialog = true }
+                            onOpenAuthManagement = { showAuthManagementDialog = true },
+                            onOpenAdminInBrowser = {
+                                currentIp?.let { ip ->
+                                    runCatching {
+                                        startActivity(
+                                            Intent(Intent.ACTION_VIEW, Uri.parse("http://$ip:6574/"))
+                                        )
+                                    }
+                                }
+                            }
                         )
                     }
                     if (showAuthManagementDialog) {
