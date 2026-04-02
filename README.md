@@ -9,6 +9,11 @@
 
 MatrixClock is an Android app for matrix-style clock and status display.
 
+> [!CAUTION]
+> **Disclaimer**
+>
+> **Vibe coding** side project, built for fun. **OLED / AMOLED** panels may **burn in** if a clock-style UI stays on for very long stretches—**use at your own risk**; you’re responsible for how you run it and for your device.
+
 **Layout:** Android code in `app/`; the LAN admin panel (Vite + React) lives in **`admin/`** at the repository root. Built assets are synced into `app/src/main/assets/web/` before packaging (see **Web admin** below).
 
 ## Download
