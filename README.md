@@ -104,6 +104,71 @@ For local frontend development, add a `.env` in `admin/` with `MATRIX_PROXY_TARG
 
 `MatrixServer` serves `GET /` (`index.html`) and `GET /assets/*` for the Vite-built JS/CSS.
 
+## HTTP API (LAN, port 6574)
+
+Base URL: `http://<device-ip>:6574`. Unless noted, protected routes require a valid **`token`** query parameter (the string returned after a successful bind). Invalid or missing tokens typically yield **`403`** with body `Forbidden`.
+
+The bundled web admin sends `token` and most other fields as **URL query parameters** (including on `POST`). NanoHTTPD exposes them via `session.parameters`; other clients could use a form body where supported. Routes that expect JSON use **`Content-Type: application/json`** and a body (see below).
+
+### Static & HTML
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `GET` | `/` | No | Web admin `index.html`. Returns **403** plain text if the web UI is disabled in app settings. |
+| `GET` | `/assets/*` | No | Vite build assets (JS, CSS, fonts, images) under `assets/`. |
+
+### Auth
+
+| Method | Path | Auth | Parameters / body | Response |
+|--------|------|------|-------------------|----------|
+| `POST` | `/api/auth/bind` | No | (none) | **200** plain text: session token on success, or `DENIED`. |
+| `POST` | `/api/auth/reset` | Valid `token` | Query: `token` (removes **that** session) | **200** `OK` or **403** `Forbidden`. |
+| `GET` | `/api/auth/list` | `token` | — | **200** JSON array of `AuthRecord` (see models below). |
+| `POST` | `/api/auth/device-info` | `token` | Query: `token`. **Body:** JSON `DeviceInfoUpdate` | **200** `OK`, **400** on bad JSON/missing body. |
+| `POST` | `/api/auth/revoke` | `token` | Query: `token`, `revokeToken` | **200** `OK` or **403**. |
+
+### Display & mode
+
+| Method | Path | Auth | Parameters | Notes |
+|--------|------|------|------------|--------|
+| `POST` | `/api/mode` | `token` | `mode` — `CLOCK` or `TEXT` (if omitted, defaults to **`CLOCK`**) | Switches display mode. **400** if `mode` is present but invalid. |
+| `GET` | `/api/clock/template` | `token` | — | **200** JSON `{"template": <int>}` (stored value 1–3). |
+| `POST` | `/api/clock/template` | `token` | `template` (int, clamped 1–3) | **200** `OK`. |
+| `POST` | `/api/display` | `token` | `text`, optional `color`, `duration`, `style`, `icon` | `duration` **omitted**, **null** (unparseable), or **≤ 0** → **persistent** status (no countdown); positive → countdown seconds. `style` optional, clamped 1–3, default **1** in app UI logic. |
+
+### Pomodoro
+
+| Method | Path | Auth | Parameters / body |
+|--------|------|------|-------------------|
+| `GET` | `/api/pomodoro/configs` | `token` | — → JSON array of `PomodoroConfig`. |
+| `POST` | `/api/pomodoro/configs` | `token` | Query: `token`. **Body:** JSON array of `PomodoroConfig`. Errors: **400** `Missing body`; **500** plain text if JSON decode fails. |
+| `GET` | `/api/pomodoro/sessions` | `token` | — → JSON array of `PomodoroSession`. |
+
+### Device & keys
+
+| Method | Path | Auth | Parameters / body |
+|--------|------|------|-------------------|
+| `GET` | `/api/device/info` | `token` | — → JSON `DeviceInfo`. **500** on internal error. |
+| `GET` | `/api/keys/settings` | `token` | — → JSON object with `volUpShort`, `volUpLong`, `volUpDouble`, `volDownShort`, `volDownLong`, `volDownDouble`. |
+| `POST` | `/api/keys/settings` | `token` | Same six fields as **query** parameters. Allowed values: short/long → `menu` \| `pomodoro`; double → `menu` \| `pomodoro` \| `none` \| `switch_pomodoro` (invalid values fall back to defaults). |
+
+### Operation log
+
+| Method | Path | Auth | Parameters | Response |
+|--------|------|------|------------|----------|
+| `GET` | `/api/oplog` | `token` | `page` (≥ 0, default 0), `pageSize` (10–100, default 50) | **200** JSON `{"items":[...],"hasMore":bool}` where each item is `OpLogEntry`. |
+
+### JSON models (Kotlin `kotlinx.serialization` field names)
+
+- **`AuthRecord`**: `token`, `ip`, `deviceName`, `deviceModel`, `systemVersion`, `batteryLevel`, `createdAt`.
+- **`DeviceInfo`** (phone): `model`, `manufacturer`, `device`, `androidVersion`, `sdkInt`, `batteryLevel`, `batteryStatus`, `screenWidthPx`, `screenHeightPx`, `screenDensity`, `isCharging`.
+- **`DeviceInfoUpdate`** (client → `/api/auth/device-info`): optional `deviceName`, `deviceModel`, `systemVersion`, `batteryLevel`.
+- **`PomodoroConfig`**: `id`, `text`, `durationSec`, `colorHex`, `isPrimary`, `countdownStyle` (1–3), `cycleTotal`.
+- **`PomodoroSession`**: `configId`, `configText`, `startTimeMillis`, `plannedDurationSec`, `completed`, `actualDurationSec`.
+- **`OpLogEntry`**: `timeMillis`, `action`, `detail`, `ip`.
+
+Implementation reference: [`app/src/main/java/cn/tr1ck/matrixclock/data/api/MatrixServer.kt`](app/src/main/java/cn/tr1ck/matrixclock/data/api/MatrixServer.kt). Frontend wrappers: [`admin/src/matrix/api.ts`](admin/src/matrix/api.ts).
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
